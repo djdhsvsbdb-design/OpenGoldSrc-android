@@ -1,36 +1,38 @@
 # Android Port Status
 
-## Initial repository audit
+## Repository findings
 
-Audit date: 2026-11-19. Android work is isolated on `android-port-bootstrap`; `master` has not been modified.
+Android work is isolated on `android-port-bootstrap`; `master` has not been modified.
 
-- OpenGoldSrc is an engine recreation, not a complete Counter-Strike 1.6 distribution.
-- The active CMake target list does not currently build the client engine/render/audio stack.
-- The repository notes GPLv3 but also warns that some source derives from material not officially open-sourced by Valve. Review provenance and licenses before distributing an APK.
+- OpenGoldSrc describes itself as a GoldSrc engine recreation, not a complete CS 1.6 distribution.
+- The active `ogs/CMakeLists.txt` disables the client-facing engine, filesystem, game, renderer, sound, and voice modules.
+- `ogs/engine/CMakeLists.txt` references implementation directories that are not present at the expected paths in this repository snapshot.
+- The launcher is a desktop executable and expects dynamically loaded engine/filesystem modules.
+- The README explicitly warns about code provenance and Valve licensing. Redistribution needs legal review.
 
-## Android scaffold
+## Android work completed on this branch
 
-- Kotlin Activity, landscape/full-screen mode, Android Surface lifecycle bridge.
-- NDK/CMake native library.
+- Kotlin Activity with landscape/full-screen mode and Android Surface lifecycle bridge.
+- NDK/CMake native shared library.
 - ABI filters: `arm64-v8a`, `armeabi-v7a`, `x86_64`.
-- Native surface and input JNI entry points.
+- Multi-touch overlay: movement joystick, look-drag region, FIRE, JUMP, DUCK, RELOAD, USE, NEXT WEAPON, SCORE.
+- Control layout scales with the shorter screen dimension.
+- JNI now places semantic control, movement-axis, and relative-look events into a bounded, thread-safe native queue.
+- Added `android_input.h` with `OGS_Android_PollInputEvent`, the non-blocking interface intended for a future engine platform-input adapter.
 
-## Mobile touch UI added
+## Critical integration gap
 
-- Left virtual joystick for movement.
-- Right-side drag area for relative view/look input.
-- On-screen FIRE, JUMP, DUCK, RELOAD, USE, NEXT WEAPON, and SCORE controls.
-- Multi-touch pointer tracking so movement/look/buttons can be used simultaneously.
-- Controls scale with the shorter screen dimension for phone/tablet layouts.
+The native queue is an input transport layer only. There is no existing client input implementation available at the expected engine paths, and the engine/client modules are disabled in the current CMake configuration. No GoldSrc code currently polls the queue. Therefore the on-screen controls are not yet driving a playable game.
 
-The Kotlin UI now emits semantic native input events. The C++ bridge currently logs those events; it is **not yet connected to GoldSrc's actual input system**, so the controls are a UI/input scaffold, not proof of playable controls.
+## Next steps
 
-## Remaining work
+1. Locate or restore a complete, license-reviewed GoldSrc client source tree.
+2. Implement an Android platform-input adapter that drains `OGS_Android_PollInputEvent` and maps events to the client's key/button/mouse interfaces.
+3. Integrate Android-compatible renderer, filesystem, audio, app lifecycle, and storage.
+4. Add editable control positions, size, opacity, and sensitivity.
+5. Build with Android SDK/NDK and test on physical phones and tablets across supported ABIs.
+6. Package only code and assets that may lawfully be redistributed. Original Valve game data may need to be supplied separately.
 
-1. Connect native control/look events to the GoldSrc client input implementation.
-2. Integrate client engine, renderer, filesystem, audio, lifecycle, and game assets.
-3. Add user-adjustable control positions, size, opacity, and sensitivity.
-4. Build with Android SDK/NDK and test on physical phones/tablets across supported ABIs.
-5. Package only code/assets that may lawfully be redistributed. Original Valve game data may need to be supplied separately.
+## Verification
 
-No APK has been built or device-tested. No playable Android port is claimed.
+No Android SDK/NDK build, APK packaging, or physical-device test has been run. No playable port is claimed.
