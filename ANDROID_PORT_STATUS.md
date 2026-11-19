@@ -57,3 +57,15 @@ The project needs a complete, license-reviewed client source base. The practical
 2. Port an existing Android-capable GoldSrc-compatible client (for example, Xash3D FWGS) as a clearly separate engine integration, after reviewing its license and the user's intended project direction.
 
 Until one of these source bases is selected and available, the native touch-event queue cannot be connected to real in-game controls.
+
+
+## Direction change: Xash3D FWGS Android client (2026-11-19)
+
+The selected direction is to use the official FWGS/Xash3D FWGS Android-capable engine as a separate integration, rather than continue a pure OpenGoldSrc port. OpenGoldSrc remains intact.
+
+- Verified the official upstream repository and its Android build instructions in `XASH3D_ANDROID_INTEGRATION.md`.
+- Confirmed upstream documents Android support, touch/gamepad input, GoldSrc protocol support, and a dedicated `android/` project.
+- Confirmed the required recursive source checkout and selected submodules, plus SDL2 and HLSDK-portable mobile branches.
+- Added the integration plan in commit `549baa0f444e34c88419c71464e25111dbb140e3`.
+
+**Not yet done:** Xash3D source has not been cloned into this repository; no upstream revision has been pinned; no Gradle/NDK build or APK has been produced; no device or multiplayer tests have been run. The GitHub file-editing connector cannot create a Git submodule gitlink, so source import requires a Git environment capable of recursive clone/submodule operations. Do not describe this as a completed engine integration.
