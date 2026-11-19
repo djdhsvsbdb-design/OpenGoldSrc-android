@@ -15,27 +15,27 @@ extern "C" JNIEXPORT void JNICALL
 Java_org_opengoldsrc_android_MainActivity_nativeSetSurface(
     JNIEnv* env, jobject /* thiz */, jobject surface) {
     ANativeWindow* next = surface ? ANativeWindow_fromSurface(env, surface) : nullptr;
-
     std::lock_guard<std::mutex> lock(g_surface_mutex);
-    if (g_window) {
-        ANativeWindow_release(g_window);
-    }
+    if (g_window) ANativeWindow_release(g_window);
     g_window = next;
-
-    if (g_window) {
-        __android_log_print(ANDROID_LOG_INFO, kTag, "Android surface attached");
-    } else {
-        __android_log_print(ANDROID_LOG_INFO, kTag, "Android surface detached");
-    }
+    __android_log_print(ANDROID_LOG_INFO, kTag, "Android surface %s",
+                        g_window ? "attached" : "detached");
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_org_opengoldsrc_android_MainActivity_nativeOnTouch(
-    JNIEnv* /* env */, jobject /* thiz */, jint action, jint pointer_id,
-    jfloat x, jfloat y, jint width, jint height) {
-    // Touch events are bridged here; mapping to GoldSrc input is a later port step.
-    __android_log_print(
-        ANDROID_LOG_VERBOSE, kTag,
-        "touch action=%d pointer=%d x=%.1f y=%.1f size=%dx%d",
-        action, pointer_id, x, y, width, height);
+Java_org_opengoldsrc_android_MainActivity_nativeOnControl(
+    JNIEnv* /* env */, jobject /* thiz */, jint control, jboolean pressed,
+    jfloat value_x, jfloat value_y) {
+    // Placeholder until GoldSrc client input is connected.
+    __android_log_print(ANDROID_LOG_VERBOSE, kTag,
+        "control=%d pressed=%d x=%.2f y=%.2f",
+        control, pressed ? 1 : 0, value_x, value_y);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_org_opengoldsrc_android_MainActivity_nativeOnLook(
+    JNIEnv* /* env */, jobject /* thiz */, jfloat delta_x, jfloat delta_y) {
+    // Relative look deltas are normalized; engine sensitivity is applied at integration.
+    __android_log_print(ANDROID_LOG_VERBOSE, kTag,
+        "look dx=%.3f dy=%.3f", delta_x, delta_y);
 }
