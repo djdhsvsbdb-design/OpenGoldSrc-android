@@ -2,53 +2,35 @@
 
 ## Initial repository audit
 
-Audit date: 2026-11-19
+Audit date: 2026-11-19. Android work is isolated on `android-port-bootstrap`; `master` has not been modified.
 
-The Android work is isolated on `android-port-bootstrap`; `master` has not been modified.
+- OpenGoldSrc is an engine recreation, not a complete Counter-Strike 1.6 distribution.
+- The active CMake target list does not currently build the client engine/render/audio stack.
+- The repository notes GPLv3 but also warns that some source derives from material not officially open-sourced by Valve. Review provenance and licenses before distributing an APK.
 
-Findings from the repository's original `master` snapshot:
+## Android scaffold
 
-- The README describes OpenGoldSrc as a recreation of the GoldSrc engine, not a complete Counter-Strike 1.6 distribution.
-- The top-level build uses CMake and adds `dep/` and `ogs/`.
-- `ogs/CMakeLists.txt` enables server/utility components but comments out key client-facing modules such as `engine`, `filesystem`, `game`, `render`, `sound`, and `voice`.
-- The README says build and installation instructions are TODO.
-- The README identifies GPLv3 but also warns that parts of the source derive from material not officially open-sourced by Valve. Component provenance and licensing need review before distributing an APK.
+- Kotlin Activity, landscape/full-screen mode, Android Surface lifecycle bridge.
+- NDK/CMake native library.
+- ABI filters: `arm64-v8a`, `armeabi-v7a`, `x86_64`.
+- Native surface and input JNI entry points.
 
-## Android scaffold added
+## Mobile touch UI added
 
-A first Android Studio project now exists under `android/`:
+- Left virtual joystick for movement.
+- Right-side drag area for relative view/look input.
+- On-screen FIRE, JUMP, DUCK, RELOAD, USE, NEXT WEAPON, and SCORE controls.
+- Multi-touch pointer tracking so movement/look/buttons can be used simultaneously.
+- Controls scale with the shorter screen dimension for phone/tablet layouts.
 
-- Kotlin Activity with landscape orientation and immersive full-screen mode.
-- Android Surface lifecycle bridged to a native C++ library using `ANativeWindow_fromSurface`.
-- Basic multi-pointer touch event bridge.
-- NDK/CMake native target.
-- ABI filters: `arm64-v8a`, `armeabi-v7a`, and `x86_64` (the last is for emulators).
+The Kotlin UI now emits semantic native input events. The C++ bridge currently logs those events; it is **not yet connected to GoldSrc's actual input system**, so the controls are a UI/input scaffold, not proof of playable controls.
 
-This is infrastructure only. The native library currently logs surface and touch events; it does not yet render or run the GoldSrc client.
+## Remaining work
 
-## Why it is not playable yet
+1. Connect native control/look events to the GoldSrc client input implementation.
+2. Integrate client engine, renderer, filesystem, audio, lifecycle, and game assets.
+3. Add user-adjustable control positions, size, opacity, and sensitivity.
+4. Build with Android SDK/NDK and test on physical phones/tablets across supported ABIs.
+5. Package only code/assets that may lawfully be redistributed. Original Valve game data may need to be supplied separately.
 
-The source snapshot's active CMake target list does not build the client engine/render/audio stack. The Android shell cannot become a game until the actual client modules and their dependencies are located, enabled, and adapted to Android.
-
-## Next engineering steps
-
-1. Map the source tree and identify the real client, renderer, filesystem, audio, input, and UI modules.
-2. Verify dependency availability and review per-component licenses and provenance.
-3. Integrate the client engine into the Android NDK build, selecting Android-compatible renderer and filesystem backends.
-4. Port lifecycle, audio, storage, asset discovery, and input.
-5. Add configurable touch controls and phone/tablet layouts.
-6. Build and test on physical devices across supported Android ABIs.
-7. Package only code and assets that may lawfully be redistributed. Original Valve game data must be supplied separately by the user where required.
-
-## Current status
-
-- [x] Isolated working branch created.
-- [x] Initial build/license audit recorded.
-- [x] Android application and native bridge scaffold added.
-- [ ] GoldSrc client integration.
-- [ ] Android renderer/audio/filesystem backends.
-- [ ] Touch controls and mobile UI.
-- [ ] NDK build and APK packaging.
-- [ ] Device runtime verification.
-
-No APK has been built. No playable Android port is claimed yet.
+No APK has been built or device-tested. No playable Android port is claimed.
