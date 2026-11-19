@@ -36,3 +36,24 @@ The native queue is an input transport layer only. There is no existing client i
 ## Verification
 
 No Android SDK/NDK build, APK packaging, or physical-device test has been run. No playable port is claimed.
+
+## Source completeness check (2026-11-19)
+
+A second pass checked the CMake dependency graph and expected source locations:
+
+- The root build references `hlsdk-core`, `goldsrc-sdk`, and `shiftutil`, but these directories/files are absent from this repository snapshot; `.gitmodules` is empty.
+- `ogs/CMakeLists.txt` has `engine`, `filesystem`, `game`, `render`, `sound`, and `voice` disabled.
+- `ogs/engine/CMakeLists.txt` selects `Null`, `AC96`, or `RW17`, but the referenced implementation CMake files are absent.
+- The `ogs/render/null` and `ogs/render/gl` CMake files are empty; the expected filesystem Stdio source file `FileSystemImpl.cpp` was not found in the snapshot.
+- GitHub code search for client input entry points (including `IN_ActivateMouse`, `IN_Move`, `Key_Event`, and `IN_MouseEvent`) returned no matches in the repository's indexed default branch.
+
+This is a source-tree/dependency gap, not just a missing Android build flag. Enabling the disabled CMake modules would not produce a client and would likely fail configuration or compilation. I have not fabricated a stub client or copied third-party engine code into the project: doing so would create a misleading, non-playable port and introduce unreviewed licensing obligations.
+
+### Required decision for the next implementation stage
+
+The project needs a complete, license-reviewed client source base. The practical routes are:
+
+1. Restore the exact missing OpenGoldSrc dependencies/source revisions and then implement Android platform backends; or
+2. Port an existing Android-capable GoldSrc-compatible client (for example, Xash3D FWGS) as a clearly separate engine integration, after reviewing its license and the user's intended project direction.
+
+Until one of these source bases is selected and available, the native touch-event queue cannot be connected to real in-game controls.
