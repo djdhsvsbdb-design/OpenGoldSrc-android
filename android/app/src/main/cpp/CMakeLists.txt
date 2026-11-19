@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(ogs_android LANGUAGES CXX)
 
-add_library(ogs_android SHARED android_bridge.cpp)
+add_library(ogs_android SHARED android_bridge.cpp android_input.h)
 
 find_library(android-lib android)
 find_library(log-lib log)
