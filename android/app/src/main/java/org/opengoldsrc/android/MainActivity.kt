@@ -25,6 +25,14 @@ class MainActivity : Activity(), SurfaceHolder.Callback {
     external fun nativeOnLook(deltaX: Float, deltaY: Float)
 
     companion object {
+        const val CTRL_MOVE = 0
+        const val CTRL_FIRE = 1
+        const val CTRL_JUMP = 2
+        const val CTRL_CROUCH = 3
+        const val CTRL_RELOAD = 4
+        const val CTRL_USE = 5
+        const val CTRL_NEXT_WEAPON = 6
+        const val CTRL_SCORE = 7
         init { System.loadLibrary("ogs_android") }
     }
 
@@ -165,6 +173,7 @@ class MainActivity : Activity(), SurfaceHolder.Callback {
                     invalidate()
                 }
                 MotionEvent.ACTION_MOVE -> {
+                    val s = base().coerceAtLeast(1f)
                     for (p in 0 until event.pointerCount) {
                         val pid = event.getPointerId(p)
                         val px = event.getX(p)
@@ -209,14 +218,4 @@ class MainActivity : Activity(), SurfaceHolder.Callback {
         }
     }
 
-    private companion object Controls {
-        const val CTRL_MOVE = 0
-        const val CTRL_FIRE = 1
-        const val CTRL_JUMP = 2
-        const val CTRL_CROUCH = 3
-        const val CTRL_RELOAD = 4
-        const val CTRL_USE = 5
-        const val CTRL_NEXT_WEAPON = 6
-        const val CTRL_SCORE = 7
-    }
 }
